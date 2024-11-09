@@ -1,0 +1,43 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+
+    id 'org.flywaydb.flyway' version '6.1.0'
+}
+
+group = 'com.cardinal'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+def postgres_host = System.getenv("POSTGRES_HOST") == null ? "localhost" : System.getenv("POSTGRES_HOST")
+flyway {
+    url = "jdbc:postgresql://${postgres_host}:5432/postgres"
+    user = 'postgres'
+    password = ''
+    schemas = ['parts']
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        showStackTraces = true
+    }
+}
